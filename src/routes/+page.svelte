@@ -1,4 +1,9 @@
 <script lang='ts'>
+	type Filter = 'All' | 'Undone' | 'Done';
+
+	let filter = $state('All') as Filter;
+	const filterOptions = ['All', 'Undone', 'Done'];
+
   let todos = $state([
 		{
 			text: 'Learn Svelte',
@@ -21,24 +26,59 @@
 
     todoElement.value = '';
 	}
+
+	const changeFilter = (event: Event) => {
+		const selectedFilter = (event.target as HTMLSelectElement).value as Filter;
+
+		filter = selectedFilter;
+	};
+
+	const setFilteredTodos = () => {
+		if (filter === 'All') return todos;
+		if (filter === 'Undone') return todos.filter((todo) => !todo.done);
+		if (filter === 'Done') return todos.filter((todo) => todo.done);
+
+		return []
+	};
+
+	const filteredTodos = $derived(setFilteredTodos())
+
+	$effect(() => {
+		console.log('filteredTodos', filteredTodos.length)
+	});
 </script>
 
 <div class="wrapper">
 	<h1 class="title">Simple Todo Application</h1>
 
+	<select name="filter" id="filter" on:change={changeFilter}>
+		{#each filterOptions as option}
+			<option value={option}>{option}</option>
+		{/each}
+	</select>
+
 	<input class="form-input" type="text" placeholder="Add todo" on:keydown={addTodo} />
 
 	<div class="todos">
-		{#each todos as todo}
-			<div class="todo">
-				<input type="text" bind:value={todo.text} />
-				<input type="checkbox" bind:checked={todo.done} />
-			</div>
-		{/each}
+		{#if filteredTodos.length === 0}
+			<p class="warning">No todos found</p>
+		{:else}
+			{#each filteredTodos as todo}
+				<div class="todo">
+					<input type="checkbox" bind:checked={todo.done} />
+					<input type="text" value={todo.text} />
+				</div>
+			{/each}
+		{/if}
 	</div>
 </div>
 
 <style>
+	:global(*, *::before, *::after) {
+		box-sizing: border-box;
+		font-family: Arial, Helvetica, sans-serif;
+	}
+
 	:global(body) {
 		background-color: #171719;
 	}
@@ -52,6 +92,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		gap: 1rem;
 	}
 
 	.title {
@@ -75,6 +116,26 @@
 		border-radius: 1rem;
 		display: flex;
 		align-self: center;
+	}
+
+	.warning {
+		color: #e10041;
+		align-self: center;
+		font-size: 1.5rem;
+	}
+
+	select {
+		background: #232229;
+		padding: 1rem;
+		margin: 0;
+		border-radius: 1rem;
+		color: white;
+		align-self: flex-end;
+		border: none;
+
+		&:focus {
+			outline: none;
+		}
 	}
 
 	input[type='text'] {
