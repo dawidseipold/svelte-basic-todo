@@ -36,8 +36,6 @@
 	$effect(() => {
 		const storedTodos = localStorage.getItem('todos');
 
-		console.log(todoInput.trim())
-
 		if (storedTodos) {
 			todos = JSON.parse(storedTodos);
 		} else {
@@ -53,7 +51,7 @@
 	
 	// Functions
   const addTodo = () => {
-		if (todoInput === '') return alert('Please enter a valid todo')
+		if (todoInput === '' || todoInput.trim() === '') return alert('Please enter a valid todo');
 
 		const id = window.crypto.randomUUID();
 		const text = todoInput.trim();
