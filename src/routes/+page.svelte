@@ -4,12 +4,18 @@
 	let filter = $state('All') as Filter;
 	const filterOptions = ['All', 'Undone', 'Done'];
 
+	const randomId = function(length: number) {
+  	return Number(Math.random().toString(36).substring(2, length + 2));
+	};
+
   let todos = $state([
 		{
+			id: randomId(32),
 			text: 'Learn Svelte',
 			done: false
 		},
 		{
+			id: randomId(32),
 			text: 'Learn SvelteKit',
 			done: false
 		}
@@ -19,10 +25,12 @@
 		if (event.key !== 'Enter') return;
 
 		const todoElement = event.target as HTMLInputElement;
+
+		const id = randomId(32)
 		const text = todoElement.value;
 		const done = false;
 
-		todos.push({ text, done });
+		todos.push({ id, text, done });
 
     todoElement.value = '';
 	}
@@ -43,9 +51,14 @@
 
 	const filteredTodos = $derived(setFilteredTodos())
 
-	$effect(() => {
-		console.log('filteredTodos', filteredTodos.length)
-	});
+	const removeTodo = (event: Event) => {
+		const todoElement = event.target as HTMLElement
+		const todoId = todoElement.closest('.todo')?.getAttribute('data-id');
+
+		if (todoId) {
+			todos.splice(todos.findIndex((todo) => todo.id === Number(todoId)), 1);
+		}
+	};
 </script>
 
 <div class="wrapper">
@@ -64,9 +77,11 @@
 			<p class="warning">No todos found</p>
 		{:else}
 			{#each filteredTodos as todo}
-				<div class="todo">
+				<div class="todo" data-id={todo.id}>
 					<input type="checkbox" bind:checked={todo.done} />
 					<input type="text" value={todo.text} />
+
+					<div class='delete-button' on:click={removeTodo}>X</div>
 				</div>
 			{/each}
 		{/if}
@@ -122,6 +137,17 @@
 		color: #e10041;
 		align-self: center;
 		font-size: 1.5rem;
+	}
+
+	.delete-button {
+		position: absolute;
+		top: 50%;
+		right: -2rem;
+		transform: translate(0, -50%);
+		font-size: 1.5rem;
+		color: #e10041;
+		cursor: pointer;
+	
 	}
 
 	select {
