@@ -50,6 +50,8 @@
 	};
 
 	const setFilteredTodos = () => {
+		if (todos === 'loading') return [];
+
 		if (filter === 'All') return todos;
 		if (filter === 'Undone') return todos.filter((todo) => !todo.done);
 		if (filter === 'Done') return todos.filter((todo) => todo.done);
