@@ -114,9 +114,17 @@
 		});
 	};
 
+	const setFinalTodos = () => {
+		if (todos === 'loading') return 'loading';
+
+		return sortedTodos.filter((todo) => filteredTodos.includes(todo));
+	};
+
 	// Derived
 	const filteredTodos = $derived(setFilteredTodos())
 	const sortedTodos = $derived(setSortedTodos())
+
+	const finalTodos = $derived(setFinalTodos());
 </script>
 
 <div class="wrapper">
@@ -142,10 +150,10 @@
 		<input class="form-input" type="text" placeholder="Add todo" on:keydown={addTodo} />
 
 		<div class="todos">
-			{#if filteredTodos.length === 0}
+			{#if finalTodos.length === 0}
 				<p class="warning">No todos found</p>
 			{:else}
-				{#each filteredTodos as todo}
+				{#each finalTodos as todo}
 					<div class="todo" data-id={todo.id}>
 						<input type="checkbox" bind:checked={todo.done} />
 						<input type="text" value={todo.text} />
