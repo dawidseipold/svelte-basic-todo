@@ -115,7 +115,7 @@
 	};
 
 	const setFinalTodos = () => {
-		if (todos === 'loading') return 'loading';
+		if (todos === 'loading') return [];
 
 		return sortedTodos.filter((todo) => filteredTodos.includes(todo));
 	};
