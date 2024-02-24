@@ -30,9 +30,13 @@
 
 	let todos = $state<Todo[] | Loading>('loading');
 
+	let todoInput = $state<string>('');
+
 	// Effects
 	$effect(() => {
 		const storedTodos = localStorage.getItem('todos');
+
+		console.log(todoInput.trim())
 
 		if (storedTodos) {
 			todos = JSON.parse(storedTodos);
@@ -48,13 +52,11 @@
 	});
 	
 	// Functions
-  const addTodo = (event: KeyboardEvent) => {
-		if (event.key !== 'Enter') return;
-
-		const todoElement = event.target as HTMLInputElement;
+  const addTodo = () => {
+		if (todoInput === '') return alert('Please enter a valid todo')
 
 		const id = window.crypto.randomUUID();
-		const text = todoElement.value;
+		const text = todoInput.trim();
 		const done = false;
 		const createdAt = new Date();
 
@@ -62,7 +64,7 @@
 			todos.push({ id, text, done, createdAt });
 		}
 
-    todoElement.value = '';
+		todoInput = '';
 	}
 
 	const removeTodo = (event: Event) => {
@@ -155,7 +157,10 @@
 			</div>
 		</header>
 
-		<input class="form-input" type="text" placeholder="Add todo" on:keydown={addTodo} />
+		<form class='form' on:submit|preventDefault={addTodo}>
+			<input class="form-input" type="text" placeholder="Add todo" bind:value={todoInput} />
+			<button class="form-button" type="submit">Add Todo</button>
+		</form>
 
 		<div class="todos">
 			{#if finalTodos.length === 0}
@@ -221,6 +226,39 @@
 	.title {
 		font-size: 4rem;
 		color: white;
+	}
+
+	.form {
+		display: flex;
+		width: 100%;
+		gap: 1rem;
+
+		&-input {
+			width: 100%;
+			background-color: transparent;
+			border: none;
+			font-size: 1.25rem;
+			color: white;
+			margin-right: 2rem;
+
+			&:focus {
+				outline: none;
+			}
+		}
+
+		&-button {
+			background-color: #e10041;
+			color: white;
+			padding: 1rem;
+			border: none;
+			border-radius: 1rem;
+			cursor: pointer;
+			font-size: 1.25rem;
+
+			&:focus {
+				outline: none;
+			}
+		}
 	}
 
 	.todos {
