@@ -158,8 +158,8 @@
 		</header>
 
 		<form class='form' on:submit|preventDefault={addTodo}>
-			<input class="form-input" type="text" placeholder="Add todo" bind:value={todoInput} />
-			<button class="form-button" type="submit">Add Todo</button>
+			<input type="text" placeholder="Add todo" bind:value={todoInput} />
+			<button type="submit">Add Todo</button>
 		</form>
 
 		<div class="todos">
@@ -227,25 +227,26 @@
 		color: white;
 	}
 
-	.form {
+	form {
 		display: flex;
 		width: 100%;
 		gap: 1rem;
 
-		&-input {
+		input {
 			width: 100%;
-			background-color: transparent;
+			background-color: #232229;
 			border: none;
+			border-radius: 1rem;
 			font-size: 1.25rem;
 			color: white;
-			margin-right: 2rem;
+			padding: 1rem;
 
 			&:focus {
 				outline: none;
 			}
 		}
 
-		&-button {
+		button {
 			background-color: #e10041;
 			color: white;
 			padding: 1rem;
@@ -253,6 +254,7 @@
 			border-radius: 1rem;
 			cursor: pointer;
 			font-size: 1.25rem;
+			text-wrap: nowrap;
 
 			&:focus {
 				outline: none;
@@ -276,6 +278,49 @@
 		border-radius: 1rem;
 		display: flex;
 		align-self: center;
+
+		input[type='text'] {
+			width: 100%;
+			background-color: transparent;
+			border: none;
+			font-size: 1.25rem;
+			color: white;
+			margin-right: 2rem;
+
+			&:focus {
+				outline: none;
+			}
+
+			&.form-input {
+				background: #232229;
+				padding: 1rem;
+				margin: 0;
+				border-radius: 1rem;
+			}
+		}
+
+		input[type='checkbox'] {
+			position: absolute;
+			top: 50%;
+			right: 1rem;
+			translate: 0 -60%;
+			appearance: none;
+			width: 1.5rem;
+			height: 1.5rem;
+			border-radius: 0.5rem;
+			border: 2px solid #4a4a4a; /* border color */
+			background-color: #2b2b2b; /* checkbox background color */
+			cursor: pointer;
+
+			&:checked {
+				background-color: #4a4a4a; /* checked background color */
+			}
+
+			&:focus {
+				outline: none;
+				box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5); /* focus outline */
+			}
+		}
 	}
 
 	.warning {
@@ -306,49 +351,6 @@
 
 		&:focus {
 			outline: none;
-		}
-	}
-
-	input[type='text'] {
-		width: 100%;
-		background-color: transparent;
-		border: none;
-		font-size: 1.25rem;
-		color: white;
-		margin-right: 2rem;
-
-		&:focus {
-			outline: none;
-		}
-
-		&.form-input {
-			background: #232229;
-			padding: 1rem;
-			margin: 0;
-			border-radius: 1rem;
-		}
-	}
-
-	input[type='checkbox'] {
-		position: absolute;
-		top: 50%;
-		right: 1rem;
-		translate: 0 -60%;
-		appearance: none;
-		width: 1.5rem;
-		height: 1.5rem;
-		border-radius: 0.5rem;
-		border: 2px solid #4a4a4a; /* border color */
-		background-color: #2b2b2b; /* checkbox background color */
-		cursor: pointer;
-
-		&:checked {
-			background-color: #4a4a4a; /* checked background color */
-		}
-
-		&:focus {
-			outline: none;
-			box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5); /* focus outline */
 		}
 	}
 </style>
