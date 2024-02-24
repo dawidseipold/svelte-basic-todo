@@ -123,8 +123,13 @@
 	// Derived
 	const filteredTodos = $derived(setFilteredTodos())
 	const sortedTodos = $derived(setSortedTodos())
-
 	const finalTodos = $derived(setFinalTodos());
+
+	const remaining = $derived(() => {
+		if (todos === 'loading') return;
+
+		return todos.filter((todo) => !todo.done).length;
+	});
 </script>
 
 <div class="wrapper">
@@ -133,19 +138,22 @@
 	{#if todos === 'loading'}
 		<p class="warning">Loading...</p>
 	{:else}
-		<div class="options-wrapper">
-			<select name="sort" id="sort" on:change={changeSort}>
-				{#each sortingOption as option}
-					<option value={option.displayedText}>{option.displayedText}</option>
-				{/each}
-			</select>
+		<header class="header">
+			<span class='remaining'>Remaining tasks: {remaining()}</span>
 
-			<select name="filter" id="filter" on:change={changeFilter}>
-				{#each filterOptions as option}
-					<option value={option}>{option}</option>
-				{/each}
-			</select>
-		</div>
+			<div class="options-wrapper">
+				<select name="sort" id="sort" on:change={changeSort}>
+					{#each sortingOption as option}
+						<option value={option.displayedText}>{option.displayedText}</option>
+					{/each}
+				</select>
+				<select name="filter" id="filter" on:change={changeFilter}>
+					{#each filterOptions as option}
+						<option value={option}>{option}</option>
+					{/each}
+				</select>
+			</div>
+		</header>
 
 		<input class="form-input" type="text" placeholder="Add todo" on:keydown={addTodo} />
 
@@ -186,6 +194,20 @@
 		flex-direction: column;
 		align-items: center;
 		gap: 1rem;
+	}
+
+	.header {
+		display: flex;
+		width: 100%;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.remaining {
+		display: flex;
+		width: 100%;
+		font-size: 1.25rem;
+		color: white;
 	}
 
 	.options-wrapper {
