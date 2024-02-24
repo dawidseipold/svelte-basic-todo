@@ -190,9 +190,8 @@
 	}
 
 	.wrapper {
-		position: absolute;
-		inset: 50%;
-		translate: -50% -50%;
+		margin: 0 auto;
+		padding: 2rem;
 		width: max-content;
 		height: max-content;
 		display: flex;
