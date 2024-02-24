@@ -1,17 +1,36 @@
 <script lang='ts'>
+	// Types
 	type Todo = {
 		id: string;
 		text: string;
 		done: boolean;
+		createdAt: Date;
 	};
+
+	interface SortType {
+		type: 'Date' | 'Name';
+		order: 'Ascending' | 'Descending';
+		displayedText: string
+	};
+
 	type Filter = 'All' | 'Undone' | 'Done';
 	type Loading = 'loading';
 
-	let filter = $state('All') as Filter;
+	// Variables
 	const filterOptions = ['All', 'Undone', 'Done'];
+	let filter = $state(filterOptions[0]) as Filter;
+
+	const sortingOption = [
+		{ type: 'Date', order: 'Ascending', displayedText: 'Latest' },
+		{ type: 'Date', order: 'Descending', displayedText: 'Oldest' },
+		{ type: 'Name', order: 'Ascending', displayedText: 'A to Z' },
+		{ type: 'Name', order: 'Descending', displayedText: 'Z to A' },
+	];
+	let sort = $state(sortingOption[0]) as SortType;
 
 	let todos = $state<Todo[] | Loading>('loading');
 
+	// Effects
 	$effect(() => {
 		const storedTodos = localStorage.getItem('todos');
 
@@ -23,10 +42,12 @@
 	});
 
 	$effect (() => {
+		if (todos === 'loading') return;
+
 		localStorage.setItem('todos', JSON.stringify(todos));
 	});
 	
-	
+	// Functions
   const addTodo = (event: KeyboardEvent) => {
 		if (event.key !== 'Enter') return;
 
@@ -35,18 +56,34 @@
 		const id = window.crypto.randomUUID();
 		const text = todoElement.value;
 		const done = false;
+		const createdAt = new Date();
 
 		if (todos !== 'loading') {
-			todos.push({ id, text, done });
+			todos.push({ id, text, done, createdAt });
 		}
 
     todoElement.value = '';
 	}
 
+	const removeTodo = (event: Event) => {
+		const todoElement = event.target as HTMLElement
+		const todoId = todoElement.closest('.todo')?.getAttribute('data-id');
+
+		if (todoId && todos !== 'loading') {
+			todos.splice(todos.findIndex((todo) => todo.id === todoId), 1);
+		}
+	};
+
 	const changeFilter = (event: Event) => {
 		const selectedFilter = (event.target as HTMLSelectElement).value as Filter;
 
 		filter = selectedFilter;
+	};
+
+	const changeSort = (event: Event) => {
+		const selectedSort = (event.target as HTMLSelectElement).value;
+
+		sort = sortingOption.find((option) => option.displayedText === selectedSort) as SortType;
 	};
 
 	const setFilteredTodos = () => {
@@ -59,16 +96,27 @@
 		return []
 	};
 
-	const removeTodo = (event: Event) => {
-		const todoElement = event.target as HTMLElement
-		const todoId = todoElement.closest('.todo')?.getAttribute('data-id');
+	const setSortedTodos = () => {
+		if (todos === 'loading') return [];
 
-		if (todoId && todos !== 'loading') {
-			todos.splice(todos.findIndex((todo) => todo.id === todoId), 1);
-		}
+		return todos.sort((a, b) => {
+			if (sort.type === 'Name') {
+				if (sort.order === 'Ascending') return a.text.localeCompare(b.text);
+				if (sort.order === 'Descending') return b.text.localeCompare(a.text);
+			}
+
+			if (sort.type === 'Date') {
+				if (sort.order === 'Ascending') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+				if (sort.order === 'Descending') return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+			}
+
+			return 0;
+		});
 	};
 
+	// Derived
 	const filteredTodos = $derived(setFilteredTodos())
+	const sortedTodos = $derived(setSortedTodos())
 </script>
 
 <div class="wrapper">
@@ -77,11 +125,19 @@
 	{#if todos === 'loading'}
 		<p class="warning">Loading...</p>
 	{:else}
-		<select name="filter" id="filter" on:change={changeFilter}>
-			{#each filterOptions as option}
-				<option value={option}>{option}</option>
-			{/each}
-		</select>
+		<div class="options-wrapper">
+			<select name="sort" id="sort" on:change={changeSort}>
+				{#each sortingOption as option}
+					<option value={option.displayedText}>{option.displayedText}</option>
+				{/each}
+			</select>
+
+			<select name="filter" id="filter" on:change={changeFilter}>
+				{#each filterOptions as option}
+					<option value={option}>{option}</option>
+				{/each}
+			</select>
+		</div>
 
 		<input class="form-input" type="text" placeholder="Add todo" on:keydown={addTodo} />
 
@@ -120,6 +176,14 @@
 		height: max-content;
 		display: flex;
 		flex-direction: column;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.options-wrapper {
+		display: flex;
+		width: 100%;
+		justify-content: end;
 		align-items: center;
 		gap: 1rem;
 	}
