@@ -99,7 +99,7 @@
 			</div>
 
 			<div class="options-wrapper">
-				<button on:click={() => multiTaskRemove(todos, 'done tasks', todos.filter(todo => !todo.done))}>Remove all done</button>
+				<button on:click={() => multiTaskRemove(todos, 'done tasks', todos.filter(todo => todo.done))}>Remove all done</button>
 
 				<button on:click={() => multiTaskRemove(todos, 'tasks', todos.filter(todo => todo))}>Remove all</button>
 			</div>
