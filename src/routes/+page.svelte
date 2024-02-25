@@ -74,6 +74,20 @@
 		}
 	};
 
+	const editTodo = (event: Event) => {
+		if (todos === 'loading') return;
+
+		const todoText = (event.target as HTMLInputElement).value.trim();
+
+		if (todoText === '') return alert('Please enter a valid todo');
+
+		todos.map((todo) => {
+			if (todo.id === (event.target as HTMLElement).closest('.todo')?.getAttribute('data-id')) {
+				todo.text = todoText;
+			}
+		})
+	}
+
 	const changeFilter = (event: Event) => {
 		const selectedFilter = (event.target as HTMLSelectElement).value as Filter;
 
@@ -156,7 +170,7 @@
 		</header>
 
 		<form class='form' on:submit|preventDefault={addTodo}>
-			<input type="text" placeholder="Add todo" bind:value={todoInput} />
+			<input type="text" placeholder="Add todo" bind:value={todoInput}  />
 			<button type="submit">Add Todo</button>
 		</form>
 
@@ -166,8 +180,10 @@
 			{:else}
 				{#each finalTodos as todo}
 					<div class="todo" data-id={todo.id}>
-						<input type="checkbox" bind:checked={todo.done} />
-						<input type="text" value={todo.text} />
+						<form>
+							<input type="text" bind:value={todo.text} on:change|preventDefault={editTodo} />
+							<input type="checkbox" bind:checked={todo.done} />
+						</form>
 
 						<div class='delete-button' on:click={removeTodo}>X</div>
 					</div>
